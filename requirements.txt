@@ -1,0 +1,17 @@
+yt-dlp
+ffmpeg-python
+imageio-ffmpeg
+faster-whisper
+google-cloud-aiplatform
+google-cloud-storage
+google-generativeai
+streamlit
+python-dotenv
+pydantic
+pydantic-settings
+google-api-python-client
+google-auth
+google-auth-oauthlib
+notion-client
+sqlalchemy
+rich

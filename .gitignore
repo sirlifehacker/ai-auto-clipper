@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Secrets — never commit
+.env
+google-service-account.json
+
+# Local data / caches (large or machine-specific)
+data/downloads/
+data/raw/
+data/processed/
+data/jobs/*.sqlite3
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

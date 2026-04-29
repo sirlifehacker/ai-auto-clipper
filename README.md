@@ -1,0 +1,116 @@
+# AI Auto Clipper
+
+Python-based viral video clipper system for turning long-form YouTube videos into reviewed, vertical short-form clips.
+
+This repository is intentionally scaffolded as a modular project. Most integrations are placeholders with TODOs so each module can be built, tested, and replaced independently.
+
+## Planned Workflow
+
+1. Accept one YouTube URL or a list of URLs.
+2. Download source videos with `yt-dlp`.
+3. Extract transcripts with Whisper or faster-whisper.
+4. Analyze transcript and visual signals with a Gemini / Vertex AI-ready abstraction.
+5. Select candidate 35-60 second clips based on viral potential.
+6. Trim and crop clips to vertical format with FFmpeg.
+7. Preview and approve clips in Streamlit.
+8. Send selected clips to After Effects via MCP for overlays, motion graphics, and VFX.
+9. Upload finished clips to Google Drive.
+10. Log clip metadata and status in Notion.
+
+## Project Structure
+
+```text
+.
+├── data/
+│   ├── clips/           # Rendered local clips
+│   ├── downloads/       # Downloaded source videos
+│   ├── jobs/            # SQLite database or JSON job state
+│   └── transcripts/     # Transcript artifacts
+├── src/
+│   └── clipper/
+│       ├── analysis/       # AI scoring and clip selection
+│       ├── download/       # YouTube download logic
+│       ├── integrations/   # After Effects MCP, Drive, Notion
+│       ├── models/         # Shared dataclasses and domain types
+│       ├── pipeline/       # End-to-end orchestration
+│       ├── processing/     # FFmpeg trim/crop/render logic
+│       ├── state/          # Local job persistence
+│       └── transcription/  # Whisper/faster-whisper adapters
+├── ui/
+│   └── streamlit_app.py # Preview/review UI skeleton
+├── .env.example
+├── requirements.txt
+└── README.md
+```
+
+## Setup
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
+```
+
+Install FFmpeg separately and make sure `ffmpeg` and `ffprobe` are available on your PATH, or set `FFMPEG_PATH` and `FFPROBE_PATH` in `.env`.
+
+## Running the Pipeline Skeleton
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m clipper.pipeline.main "https://www.youtube.com/watch?v=example"
+```
+
+The current pipeline raises `NotImplementedError` at integration boundaries. This is expected until each module is implemented.
+
+## Running the Preview UI
+
+```powershell
+$env:PYTHONPATH = "src"
+streamlit run app.py
+```
+
+## Direct Gemini Video Analysis
+
+`src/ai/video_analyzer.py` supports direct multimodal video analysis with Gemini Flash through Vertex AI. This is designed to inspect the video file itself for expressive faces, gestures, scene changes, on-screen text, visual risks, and short-form potential.
+
+For local testing without credentials, keep:
+
+```env
+VIDEO_ANALYZER_PROVIDER=mock
+```
+
+For Vertex AI:
+
+```env
+VIDEO_ANALYZER_PROVIDER=vertex
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_CLOUD_LOCATION=us-central1
+VERTEX_VIDEO_MODEL=gemini-1.5-flash
+GCS_TEMP_BUCKET=your-temporary-video-bucket
+```
+
+Long videos may exceed direct request limits. When that happens, the analyzer uploads the source video to `GCS_TEMP_BUCKET` and passes the `gs://` URI to Vertex AI. If the video is too large and no bucket is configured, the module falls back to the mock analyzer rather than extracting frames across the full video.
+
+Output is saved beside the raw source video:
+
+```text
+data/raw/{video_id}/visual_analysis.json
+```
+
+## Build Order
+
+1. Implement YouTube download in `src/clipper/download/youtube.py`.
+2. Implement transcription in `src/clipper/transcription/transcriber.py`.
+3. Implement AI clip scoring in `src/clipper/analysis/analyzer.py`.
+4. Implement FFmpeg render logic in `src/clipper/processing/ffmpeg.py`.
+5. Expand the Streamlit review flow in `ui/streamlit_app.py`.
+6. Add After Effects MCP, Google Drive, and Notion integrations.
+7. Upgrade JSON job state in `src/clipper/state/store.py` to SQLite if richer querying is needed.
+
+## Notes
+
+- Keep provider-specific code behind small adapter classes.
+- Keep durable job state in `data/jobs` so failed jobs can resume.
+- Avoid putting API keys or OAuth secrets in source control.
+- Do not extract frames across entire long videos as the default visual analysis strategy. If frame extraction is added later, use it only around transcript-selected candidate moments.
