@@ -439,9 +439,8 @@ def render_youtube_ingestion() -> None:
             progress_callback=progress_callback,
         )
     except Exception as exc:
-        full_error = str(exc)
-        progress_callback("Failed", full_error[:120], 100)
-        st.sidebar.error(full_error)
+        progress_callback("Failed", str(exc), 100)
+        st.sidebar.error(f"Processing failed: {exc}")
         return
 
     progress_callback("Complete", f"Ready for review: {raw_video_dir.name}", 100)
