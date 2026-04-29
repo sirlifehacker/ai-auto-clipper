@@ -83,7 +83,7 @@ def download_video(
         }
     except (DownloadError, OSError, ValueError) as exc:
         logger.exception("Failed to download YouTube URL: %s", url)
-        raise RuntimeError(f"Failed to download YouTube URL: {url}") from exc
+        raise RuntimeError(f"Failed to download YouTube URL: {url}\n\nReason: {exc}") from exc
 
 
 def _extract_info(url: str, settings: Settings) -> dict[str, Any]:
