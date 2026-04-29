@@ -4,6 +4,11 @@ from clipper.config import get_settings
 from clipper.state import JobStore
 
 
+@st.cache_data
+def load_recent_jobs(_store: JobStore) -> list:
+    return _store.list_recent()
+
+
 def main() -> None:
     st.set_page_config(page_title="AI Auto Clipper", layout="wide")
     st.title("AI Auto Clipper")
@@ -12,9 +17,15 @@ def main() -> None:
     store = JobStore(settings)
 
     st.sidebar.header("Create Job")
-    urls_text = st.sidebar.text_area("YouTube URLs", placeholder="Paste one URL per line")
+    with st.sidebar.form("new_project_form"):
+        urls_text = st.text_area(
+            "YouTube URLs",
+            placeholder="Paste one URL per line",
+            key="sidebar_youtube_urls",
+        )
+        submitted = st.form_submit_button("Create Clip Job")
 
-    if st.sidebar.button("Create Clip Job"):
+    if submitted:
         urls = [line.strip() for line in urls_text.splitlines() if line.strip()]
         if not urls:
             st.sidebar.error("Add at least one YouTube URL.")
@@ -24,7 +35,7 @@ def main() -> None:
 
     st.header("Review Queue")
     try:
-        jobs = store.list_recent()
+        jobs = load_recent_jobs(store)
     except NotImplementedError:
         st.info("Local job storage is not implemented yet. Jobs will appear here once JobStore is wired.")
         return
