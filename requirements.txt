@@ -5,7 +5,7 @@ faster-whisper
 google-cloud-aiplatform
 google-cloud-storage
 google-generativeai
-streamlit
+streamlit==1.45.0
 python-dotenv
 pydantic
 pydantic-settings
