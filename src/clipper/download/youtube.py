@@ -149,11 +149,23 @@ def _download_percent(status: dict[str, Any]) -> float:
 
 
 def _base_ytdlp_options(settings: Settings) -> dict[str, Any]:
+    import shutil
+
     options: dict[str, Any] = {
         "noplaylist": True,
     }
     if settings.ytdlp_cookies_file:
         options["cookiefile"] = settings.ytdlp_cookies_file
+
+    # Provide a JS runtime for YouTube extraction (required since late 2024).
+    # Prefer node if available (installed via packages.txt on Streamlit Cloud),
+    # then fall back to deno if present; omit the flag if neither is found so
+    # yt-dlp can still attempt extraction with its own fallback logic.
+    for runtime in ("node", "deno"):
+        if shutil.which(runtime):
+            options["js_runtimes"] = [runtime]
+            break
+
     return options
 
 
