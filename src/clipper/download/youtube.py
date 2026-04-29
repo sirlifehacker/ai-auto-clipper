@@ -83,7 +83,7 @@ def download_video(
         }
     except (DownloadError, OSError, ValueError) as exc:
         logger.exception("Failed to download YouTube URL: %s", url)
-        raise RuntimeError(f"Failed to download YouTube URL: {url}\n\nReason: {exc}") from exc
+        raise RuntimeError(f"Failed to download YouTube URL: {url}\n\nDetails: {exc}") from exc
 
 
 def _extract_info(url: str, settings: Settings) -> dict[str, Any]:
@@ -153,17 +153,31 @@ def _base_ytdlp_options(settings: Settings) -> dict[str, Any]:
 
     options: dict[str, Any] = {
         "noplaylist": True,
+        # Mimic a real browser to reduce bot-detection rejections from YouTube
+        "http_headers": {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+        },
+        # Use the android client as a fallback — it bypasses many bot checks
+        "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+        "socket_timeout": 30,
+        "retries": 5,
+        "quiet": True,
+        "no_warnings": False,
     }
     if settings.ytdlp_cookies_file:
         options["cookiefile"] = settings.ytdlp_cookies_file
 
     # Provide a JS runtime for YouTube extraction (required since late 2024).
     # Prefer node if available (installed via packages.txt on Streamlit Cloud),
-    # then fall back to deno if present; omit the flag if neither is found so
-    # yt-dlp can still attempt extraction with its own fallback logic.
-    for runtime in ("node", "deno"):
-        if shutil.which(runtime):
-            options["js_runtimes"] = [runtime]
+    # then fall back to deno if present.
+    for runtime in ("node", "nodejs", "deno"):
+        runtime_path = shutil.which(runtime)
+        if runtime_path:
+            options["js_runtimes"] = [runtime_path]
             break
 
     return options
