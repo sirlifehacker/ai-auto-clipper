@@ -43,30 +43,36 @@ This repository is intentionally scaffolded as a modular project. Most integrati
 └── README.md
 ```
 
-## Setup
+## Installation (Windows — no coding required)
+
+1. **Download or clone this repository** to a folder on your computer.
+2. **Double-click `install.bat`** — it will:
+   - Check that Python 3.11+ is installed (and tell you where to get it if not)
+   - Create an isolated Python environment (`.venv`)
+   - Install all dependencies automatically
+   - Open `.env` in Notepad so you can add your API keys
+3. **Fill in your API keys** in the `.env` file that opens (see Configuration below).
+4. **Double-click `Start AI Auto Clipper.bat`** to launch the app — it opens automatically in your browser.
+
+> To stop the app, press any key in the launcher window or close it.
+
+## Configuration
+
+Copy `.env.example` to `.env` (the installer does this automatically) and fill in:
+
+| Key | Where to get it |
+|-----|----------------|
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/) |
+| `GOOGLE_CLOUD_PROJECT` | Your GCP project ID |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to your service account JSON file |
+
+## Developer Setup
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env
-```
-
-Install FFmpeg separately and make sure `ffmpeg` and `ffprobe` are available on your PATH, or set `FFMPEG_PATH` and `FFPROBE_PATH` in `.env`.
-
-## Running the Pipeline Skeleton
-
-```powershell
-$env:PYTHONPATH = "src"
-python -m clipper.pipeline.main "https://www.youtube.com/watch?v=example"
-```
-
-The current pipeline raises `NotImplementedError` at integration boundaries. This is expected until each module is implemented.
-
-## Running the Preview UI
-
-```powershell
-$env:PYTHONPATH = "src"
 streamlit run app.py
 ```
 
