@@ -172,12 +172,13 @@ def _base_ytdlp_options(settings: Settings) -> dict[str, Any]:
         options["cookiefile"] = settings.ytdlp_cookies_file
 
     # Provide a JS runtime for YouTube extraction (required since late 2024).
+    # js_runtimes must be a dict of {runtime_name: config_dict}.
     # Prefer node if available (installed via packages.txt on Streamlit Cloud),
-    # then fall back to deno if present.
+    # then fall back to deno; omit entirely if neither is found.
     for runtime in ("node", "nodejs", "deno"):
         runtime_path = shutil.which(runtime)
         if runtime_path:
-            options["js_runtimes"] = [runtime_path]
+            options["js_runtimes"] = {runtime: {}}
             break
 
     return options
