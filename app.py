@@ -246,6 +246,41 @@ def inject_dashboard_css() -> None:
             color: #111827 !important;
             -webkit-text-fill-color: #111827 !important;
         }
+        /* Force all widget labels, form labels, and markdown text to be dark */
+        label, .stTextInput label, .stNumberInput label,
+        .stSelectbox label, .stCheckbox label, .stTextArea label,
+        [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
+        [data-testid="stWidgetLabel"] span,
+        .stMarkdown p, .stMarkdown span,
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] div {
+            color: #111827 !important;
+            -webkit-text-fill-color: #111827 !important;
+        }
+        /* Checkbox label */
+        [data-testid="stCheckbox"] label p,
+        [data-testid="stCheckbox"] span {
+            color: #111827 !important;
+            -webkit-text-fill-color: #111827 !important;
+        }
+        /* Selectbox dropdown option text */
+        [data-baseweb="select"] [data-testid="stSelectboxVirtualDropdown"],
+        [data-baseweb="menu"] li {
+            color: #111827 !important;
+            background: #FFFFFF !important;
+        }
+        /* Number input stepper buttons */
+        [data-testid="stNumberInput"] button {
+            color: #111827 !important;
+            background: #F9FAFB !important;
+            border-color: var(--border) !important;
+        }
+        /* Muted sidebar labels like "New Project" section header */
+        .sidebar-section {
+            color: var(--muted) !important;
+        }
         .insight-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
